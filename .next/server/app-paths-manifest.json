@@ -1,0 +1,5 @@
+{
+  "/api/dpe/route": "app/api/dpe/route.js",
+  "/api/geocode/route": "app/api/geocode/route.js",
+  "/page": "app/page.js"
+}

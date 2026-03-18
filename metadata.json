@@ -1,0 +1,7 @@
+{
+  "name": "DPE Radar",
+  "description": "Radar d'opportunités immobilières basé sur les flux de DPE en temps réel pour les professionnels de l'immobilier.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

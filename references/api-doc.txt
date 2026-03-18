@@ -1,0 +1,3686 @@
+A. API publique du jeu de données : DPE Logements existants (depuis juillet 2021) 
+
+Cette documentation interactive à destination des développeurs permet de consommer les ressources du jeu de données "DPE Logements existants (depuis juillet 2021)".
+
+Pour protéger l'infrastructure de publication de données, les appels sont limités par quelques règles simples :
+
+Un utilisateur anonyme ne peut pas effectuer plus de 600 requêtes par intervalle de 60 secondes.
+Sa vitesse de téléchargement totale sera limitée à 8 MB/s pour les contenus statiques (fichiers de données, pièces jointes, etc.) et à 500 kB/s pour les autres appels.
+Un utilisateur authentifié (session ou clé d'API) ne peut pas effectuer plus de 1200 requêtes par intervalle de 60 secondes.
+Sa vitesse de téléchargement totale sera limitée à 16 MB/s pour les contenus statiques (fichiers de données, pièces jointes, etc.) et à 1 MB/s pour les autres appels.
+
+B. Schémas
+
+Dataset : 
+
+{
+  "$id": "https://github.com/data-fair/data-fair/dataset-resolved",
+  "x-exports": [
+    "types",
+    "resolvedSchema"
+  ],
+  "title": "Dataset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "createdAt",
+    "owner",
+    "title"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Globally unique identifier of the dataset",
+      "pattern": "^[a-z0-9_\\-]+$"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Identifier of the dataset, usually a slug for URL readability (unique inside the tenant)",
+      "pattern": "^[a-z0-9]{1}[a-z0-9_\\-]*[a-z0-9]{1}$"
+    },
+    "href": {
+      "type": "string",
+      "description": "Readonly field. The URL where this resource can be fetched"
+    },
+    "page": {
+      "type": "string",
+      "description": "Readonly field. The URL where this resource can be viewed in the UI"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short title of the dataset"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Short description of the dataset"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the dataset"
+    },
+    "image": {
+      "type": "string",
+      "description": "URL d'une image, illustration du jeu de données"
+    },
+    "spatial": {
+      "type": "string",
+      "description": "spatial coverage"
+    },
+    "temporal": {
+      "type": "object",
+      "description": "temporal coverage",
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date"
+        },
+        "end": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "keywords": {
+      "type": "array",
+      "description": "keywords",
+      "items": {
+        "type": "string"
+      }
+    },
+    "frequency": {
+      "type": "string",
+      "description": "update frequency",
+      "enum": [
+        "",
+        "triennial",
+        "biennial",
+        "annual",
+        "semiannual",
+        "threeTimesAYear",
+        "quarterly",
+        "bimonthly",
+        "monthly",
+        "semimonthly",
+        "biweekly",
+        "threeTimesAMonth",
+        "weekly",
+        "semiweekly",
+        "threeTimesAWeek",
+        "daily",
+        "continuous",
+        "irregular"
+      ]
+    },
+    "creator": {
+      "type": "string"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "protected",
+        "private"
+      ]
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "size",
+        "mimetype",
+        "schema"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the file that was used to create or update this dataset"
+        },
+        "size": {
+          "type": "number",
+          "description": "Size of the file on disk"
+        },
+        "encoding": {
+          "type": "string",
+          "description": "Encoding of the file (either explicitly defined or detected)"
+        },
+        "explicitEncoding": {
+          "type": "string",
+          "description": "Encoding of the file explicitly defined when loading it"
+        },
+        "mimetype": {
+          "type": "string",
+          "description": "Mime type of the file"
+        },
+        "schema": {
+          "type": "array",
+          "description": "JSON schema properties of the fields in the file",
+          "items": {
+            "type": "object",
+            "required": [
+              "key"
+            ],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "separator": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "dateFormat": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "dateTimeFormat": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "timeZone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "numLines": {
+              "type": "number",
+              "description": "Number of lines this file has."
+            },
+            "linesDelimiter": {
+              "type": "string",
+              "description": "New line character or characters (can be \r\n))"
+            },
+            "fieldsDelimiter": {
+              "type": "string",
+              "description": "Fields delimiter"
+            },
+            "escapeChar": {
+              "type": "string",
+              "description": "Character used to escape string"
+            },
+            "quote": {
+              "type": "string",
+              "description": "Character used to wrap strings"
+            }
+          }
+        }
+      }
+    },
+    "originalFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "size",
+        "mimetype"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the file that was used to create or update this dataset"
+        },
+        "size": {
+          "type": "number",
+          "description": "Size of the file on disk"
+        },
+        "encoding": {
+          "type": "string",
+          "description": "Encoding of the file (either explicitly defined or detected)"
+        },
+        "explicitEncoding": {
+          "type": "string",
+          "description": "Encoding of the file explicitly defined when loading it"
+        },
+        "normalizeOptions": {
+          "type": "object",
+          "description": "Normalize options specific to the original file format",
+          "additionalProperties": false,
+          "properties": {
+            "spreadsheetWorksheetIndex": {
+              "type": "number"
+            },
+            "spreadsheetHeaderLine": {
+              "type": "number"
+            },
+            "spreadsheetStartCol": {
+              "type": "number"
+            }
+          }
+        },
+        "mimetype": {
+          "type": "string",
+          "description": "Mime type of the file"
+        },
+        "md5": {
+          "type": "string",
+          "description": "MD5 hash of the file content"
+        }
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Titre",
+            "x-props": {
+              "outlined": true,
+              "dense": true
+            }
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "x-display": "markdown"
+          },
+          "includeInCatalogPublications": {
+            "type": "boolean",
+            "title": "Inclure dans les publications sur catalogue",
+            "default": false
+          }
+        },
+        "oneOf": [
+          {
+            "title": "Fichier",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "type": {
+                "title": "Type de pièce jointe",
+                "const": "file"
+              },
+              "name": {
+                "x-display": "hidden",
+                "type": "string",
+                "description": "Name of the file that was used to create or update this attachment"
+              },
+              "size": {
+                "x-display": "hidden",
+                "type": "number",
+                "description": "Size of the file on disk"
+              },
+              "mimetype": {
+                "x-display": "hidden",
+                "type": "string",
+                "description": "Mime type of the file"
+              },
+              "updatedAt": {
+                "x-display": "hidden",
+                "type": "string",
+                "description": "Date of the last update for this attachment",
+                "format": "date-time"
+              },
+              "url": {
+                "x-display": "hidden",
+                "readOnly": true,
+                "type": "string",
+                "title": "URL"
+              }
+            }
+          },
+          {
+            "title": "Lien",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "type": {
+                "title": "Type de pièce jointe",
+                "const": "url"
+              },
+              "url": {
+                "type": "string",
+                "title": "URL"
+              }
+            }
+          },
+          {
+            "title": "Fichier récupéré depuis une URL",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "type": {
+                "title": "Type de pièce jointe",
+                "const": "remoteFile"
+              },
+              "name": {
+                "type": "string",
+                "title": "Nom du fichier",
+                "description": "Ce nom doit contenir l'extension qui doit correspondre au format du fichier téléchargé.",
+                "x-rules": [
+                  "hasExtension"
+                ]
+              },
+              "targetUrl": {
+                "type": "string",
+                "title": "URL de téléchargement",
+                "description": "Cette URL n'est pas consultable après écriture. Elle est utilisée pour télécharger le fichier depuis un service distant et peut contenir un secret. Vous pouvez la laisser vide quand vous modifiez les autres informations, mais vous devez la renseigner de nouveau si vous changez le nom de fichier."
+              }
+            }
+          }
+        ]
+      }
+    },
+    "storage": {
+      "type": "object",
+      "description": "All storage space info of this dataset",
+      "properties": {
+        "size": {
+          "type": "integer"
+        },
+        "indexed": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "integer"
+            },
+            "parts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "collection",
+                  "original-file",
+                  "normalized-file",
+                  "full-file",
+                  "attachments",
+                  "master-data"
+                ]
+              }
+            }
+          }
+        },
+        "attachments": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            }
+          }
+        },
+        "metadataAttachments": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            }
+          }
+        },
+        "collection": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            }
+          }
+        },
+        "revisions": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            }
+          }
+        },
+        "masterData": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "size": {
+              "type": "integer"
+            }
+          }
+        },
+        "dataFiles": {
+          "type": "array",
+          "description": "Le tableau de résultats.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "mimetype": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Creation date of this dataset",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Date of the last metadata update for this dataset",
+      "format": "date-time"
+    },
+    "updatedBy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "dataUpdatedAt": {
+      "type": "string",
+      "description": "Date of the last update for this dataset",
+      "format": "date-time"
+    },
+    "dataUpdatedBy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "finalizedAt": {
+      "type": "string",
+      "description": "Date of the last finalization for this dataset",
+      "format": "date-time"
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "id",
+        "name"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "user",
+            "organization"
+          ],
+          "description": "If the owner is a user or an organization"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique id of the user or organization"
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the user or organization"
+        },
+        "role": {
+          "type": "string",
+          "deprecated": true,
+          "description": "DEPRECATED - If this is set and owner is an organization, this restrict ownership to users of this organization having this role or admin role"
+        },
+        "department": {
+          "type": "string",
+          "description": "If this is set and owner is an organization, this gives ownership to users of this organization that belong to this department"
+        },
+        "departmentName": {
+          "type": "string",
+          "description": "The display name of the department"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "created",
+        "remote",
+        "uploaded",
+        "loaded",
+        "imported",
+        "stored",
+        "analyzed",
+        "normalized",
+        "validated",
+        "validation-updated",
+        "schematized",
+        "indexed",
+        "extended",
+        "finalized",
+        "error"
+      ],
+      "description": "The processing steps of a dataset."
+    },
+    "errorStatus": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "created",
+        "remote",
+        "uploaded",
+        "loaded",
+        "imported",
+        "stored",
+        "analyzed",
+        "normalized",
+        "validated",
+        "validation-updated",
+        "schematized",
+        "indexed",
+        "extended",
+        "finalized",
+        "error"
+      ],
+      "description": "The processing step the dataset was in when it encountered an error."
+    },
+    "errorRetry": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If defined the task that triggered an error will be retried after a delay."
+    },
+    "primaryKey": {
+      "type": "array",
+      "description": "List of properties of the schema used as unique primary key for each line",
+      "items": {
+        "type": "string"
+      }
+    },
+    "schema": {
+      "type": "array",
+      "description": "JSON schema properties of the fields",
+      "items": {
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "readOnly": true,
+            "x-display": "hidden"
+          },
+          "type": {
+            "type": "string"
+          },
+          "format": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "x-originalName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "x-group": {
+            "type": "string"
+          },
+          "x-refersTo": {
+            "deprecated": true,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "x-concept": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "primary": {
+                "type": "boolean"
+              }
+            }
+          },
+          "x-calculated": {
+            "type": "boolean"
+          },
+          "x-capabilities": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "boolean",
+                "default": true,
+                "x-display": "switch",
+                "title": "Filtrable sur valeur exacte",
+                "description": "Désactivez cette capacité si la donnée contient par exemple des textes longs pour lesquels des filtres sur valeurs exactes ont peu de sens."
+              },
+              "values": {
+                "type": "boolean",
+                "default": true,
+                "x-display": "switch",
+                "title": "Triable et groupable",
+                "description": "Désactivez cette capacité si la donnée contient par exemple des textes longs pour lesquels trier ou grouper par valeur a peu de sens."
+              },
+              "textStandard": {
+                "type": "boolean",
+                "default": true,
+                "x-display": "switch",
+                "title": "Texte analysé pour recherche textuelle",
+                "description": "Désactivez cette capacité dans le cas d'un code, une url, etc. N'importe quel contenu sur lequel la recherche de mots a peu de sens."
+              },
+              "text": {
+                "type": "boolean",
+                "default": true,
+                "x-display": "switch",
+                "title": "Texte analysé spécifiquement pour la langue française",
+                "description": "Désactivez cette capacité pour tout contenu qui n'est pas en langue française ou pour lequel la recherche de mots a peu de sens."
+              },
+              "textAgg": {
+                "type": "boolean",
+                "default": false,
+                "x-display": "switch",
+                "title": "Statistiques de mots",
+                "description": "Activez cette capacité si avez l'intention d'obtenir des statistiques sur les occurrences de mots (par exemple pour construire un nuage de mot)."
+              },
+              "wildcard": {
+                "type": "boolean",
+                "default": false,
+                "x-display": "switch",
+                "title": "Texte filtrable sur groupe de caractères",
+                "description": "Activez cette capacité si vous avez l'intention de filtrer ce contenu spécifiquement sur une suite de caractères (par exemple si un filtre sur mots entiers ou sur valeur exacte ne convient pas)."
+              },
+              "insensitive": {
+                "type": "boolean",
+                "default": true,
+                "x-display": "switch",
+                "title": "Tri amélioré avec casse et accents",
+                "description": "Désactivez cette capacité si le contenu ne sera pas utilisé pour du tri ou bien si il ne contient pas de variations avec accents et majuscules."
+              },
+              "geoShape": {
+                "type": "boolean",
+                "default": true,
+                "x-display": "switch",
+                "title": "Formes géométriques complexes",
+                "description": "Désactivez cette capacité si la donnée ne contient que des géométries basiques de points ou bien si requêter les géométries uniquement à partir de leurs centroïdes est suffisant pour vos besoins."
+              },
+              "vtPrepare": {
+                "type": "boolean",
+                "default": false,
+                "x-display": "switch",
+                "title": "Tuiles vectorielles préparées",
+                "description": "Activez cette capacité pour précalculer des éléments utiles à la construction de tuiles vectorielles pour le rendu cartographique du jeu de données. Activez cette option si le jeu de données contient des données géogreaphiques denses à afficher en grande quantité. La contre-partie est une augmentation du temps d'indexation et du volume de données indexées."
+              },
+              "indexAttachment": {
+                "type": "boolean",
+                "default": true,
+                "x-display": "switch",
+                "title": "Contenu des pièces jointes analysé pour recherche textuelle",
+                "description": "Désactivez cette option si vous souhaitez que les pièces jointes soient simplement téléchargeables et que l'extraction de leur contenu textuel pour recherche de mots n'est pas pertinente."
+              }
+            }
+          },
+          "x-labels": {
+            "type": "object",
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            }
+          },
+          "x-labelsRestricted": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "x-required": {
+            "type": "boolean"
+          },
+          "minLength": {
+            "type": "integer"
+          },
+          "maxLength": {
+            "type": "integer"
+          },
+          "minimum": {
+            "type": "number"
+          },
+          "maximum": {
+            "type": "number"
+          },
+          "pattern": {
+            "type": "string",
+            "format": "regex"
+          },
+          "patternErrorMessage": {
+            "type": "string"
+          },
+          "x-master": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "remoteService": {
+                "type": "string",
+                "description": "L'identifiant du service distant utilisé pour l'enrichissement"
+              },
+              "action": {
+                "type": "string",
+                "description": "L'identifiant de l'action du service distant à utiliser pour l'enrichissement"
+              }
+            }
+          },
+          "x-display": {
+            "type": "string"
+          },
+          "enum": {
+            "type": "array",
+            "readOnly": true,
+            "description": "This differs from JSON schema. It is not a restriction, just and observation of the values that are present in the dataset."
+          },
+          "x-cardinality": {
+            "type": "integer",
+            "description": "The number of distinct values for this field",
+            "readOnly": true
+          },
+          "x-transform": {
+            "type": "object",
+            "description": "Transformation to apply to the field",
+            "properties": {
+              "expr": {
+                "type": "string"
+              },
+              "examples": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "type": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "count": {
+      "type": "number",
+      "description": "The number of indexed documents of a dataset"
+    },
+    "bbox": {
+      "type": "array",
+      "description": "The spatial coverage of this dataset, in bounding box format.",
+      "items": {
+        "type": "number"
+      }
+    },
+    "timePeriod": {
+      "type": "object",
+      "description": "The temporal coverage of this dataset",
+      "properties": {
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "timeZone": {
+      "type": "string",
+      "description": "The original time zone of the calendar."
+    },
+    "projection": {
+      "type": "object",
+      "description": "The cartographic projection of this dataset. Refers to the list of supported projections in contract/projections.json",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "href"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Short title for the license"
+        },
+        "href": {
+          "type": "string",
+          "description": "The URL where the license can be read"
+        }
+      }
+    },
+    "origin": {
+      "type": "string",
+      "description": "The URL where the original data can be found"
+    },
+    "extensions": {
+      "type": "array",
+      "description": "Définition des enrichissements appliqués à ce jeu de données",
+      "items": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Toggle on and off the extension"
+          },
+          "needsUpdate": {
+            "type": "boolean"
+          },
+          "autoUpdate": {
+            "type": "boolean"
+          },
+          "nextUpdate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "type",
+              "expr",
+              "property"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "exprEval"
+              },
+              "expr": {
+                "type": "string"
+              },
+              "property": {
+                "type": "object",
+                "required": [
+                  "key",
+                  "type"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": [
+              "type",
+              "remoteService",
+              "action"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "remoteService"
+              },
+              "remoteService": {
+                "type": "string",
+                "description": "L'identifiant du service distant utilisé pour l'enrichissement"
+              },
+              "action": {
+                "type": "string",
+                "description": "L'identifiant de l'action du service distant à utiliser pour l'enrichissement"
+              },
+              "select": {
+                "type": "array",
+                "description": "La liste des colonnes à sélectionner dans le retour du service distant. Toutes les colonnes si absent ou vide.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "overwriteProperties": {
+                "type": "object",
+                "description": "Les attributs à surcharger sur les proprités résultats de l'enrichissement",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "x-originalName": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "shortId": {
+                "type": "string",
+                "description": "Id court (déprécié)",
+                "readOnly": true
+              },
+              "propertyPrefix": {
+                "type": "string",
+                "description": "Chaine à utiliser comme préfixe des clés de champs issus de cette extension"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "masterData": {
+      "type": "object",
+      "title": "Données de référence",
+      "properties": {
+        "shareOrgs": {
+          "type": "array",
+          "title": "Partagez cette donnée de référence avec vos partenaires",
+          "x-if": "context.ownerOrg",
+          "x-fromUrl": "{context.directoryUrl}/api/{context.dataset.owner.type}s/{context.dataset.owner.id}",
+          "x-itemsProp": "partners",
+          "x-itemTitle": "name",
+          "x-itemKey": "id",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "bulkSearchs": {
+          "type": "array",
+          "title": "Récupération de lignes en masse",
+          "x-class": "my-4",
+          "x-options": {
+            "editMode": "dialog"
+          },
+          "items": {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "title": "Identifiant",
+                "x-if": "parent.value.id",
+                "readOnly": true
+              },
+              "title": {
+                "type": "string",
+                "title": "Titre",
+                "x-props": {
+                  "placeholder": "exemple \"récupérer les informations de plusieurs produits\""
+                },
+                "minLength": 3
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "x-display": "textarea",
+                "x-props": {
+                  "placeholder": "exemple \"cet enrichissement vous permet de récupérer les informations de plusieurs produits à partir d'une liste de codes produits.\""
+                }
+              },
+              "filters": {
+                "type": "array",
+                "title": "Filtres statiques",
+                "x-class": "mb-4",
+                "x-options": {
+                  "editMode": "inline"
+                },
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "property",
+                    "values"
+                  ],
+                  "properties": {
+                    "property": {
+                      "type": "object",
+                      "title": "Propriété sur laquelle appliquer le filtre",
+                      "x-fromData": "context.filterProperties",
+                      "x-itemTitle": "title",
+                      "x-itemKey": "key"
+                    },
+                    "values": {
+                      "type": "array",
+                      "title": "Valeurs",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "input": {
+                "type": "array",
+                "title": "Méthodes de correspondance",
+                "x-class": "mb-4",
+                "minItems": 1,
+                "x-options": {
+                  "editMode": "inline"
+                },
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "type",
+                    "property"
+                  ],
+                  "oneOf": [
+                    {
+                      "title": "Valeurs exactement égales",
+                      "required": [
+                        "type",
+                        "property"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "equals",
+                          "title": "Type de méthode de correspondance"
+                        },
+                        "property": {
+                          "type": "object",
+                          "title": "Propriété comparée",
+                          "x-fromData": "context.propertiesWithConcepts",
+                          "x-itemTitle": "title",
+                          "x-itemKey": "key"
+                        }
+                      }
+                    },
+                    {
+                      "title": "Date dans un interval",
+                      "x-if": "context.hasDateIntervalConcepts",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "date-in-interval"
+                        },
+                        "property": {
+                          "type": "object",
+                          "title": "Date à renseigner",
+                          "properties": {
+                            "x-refersTo": {
+                              "type": "string",
+                              "const": "http://schema.org/Date"
+                            },
+                            "key": {
+                              "type": "string",
+                              "const": "_date"
+                            },
+                            "type": {
+                              "type": "string",
+                              "const": "string"
+                            },
+                            "format": {
+                              "type": "string",
+                              "const": "date-time"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "title": "Coordonnée géographique à proximité",
+                      "x-if": "context.dataset.bbox",
+                      "required": [
+                        "type",
+                        "distance"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "geo-distance"
+                        },
+                        "distance": {
+                          "type": "integer",
+                          "title": "Distance",
+                          "default": 0
+                        },
+                        "property": {
+                          "type": "object",
+                          "title": "Point à renseigner",
+                          "properties": {
+                            "x-refersTo": {
+                              "type": "string",
+                              "const": "http://www.w3.org/2003/01/geo/wgs84_pos#lat_long"
+                            },
+                            "key": {
+                              "type": "string",
+                              "const": "_geopoint"
+                            },
+                            "type": {
+                              "type": "string",
+                              "const": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "sort": {
+                "type": "string",
+                "title": "Tri pour choisir parmi des résultats ambigus",
+                "description": "\nRemarque : ce paramètre est optionnel et utile uniquement si la manière d'établir une correspondance est susceptible de retourner plusieurs résultats par ligne.\n\nLe tri est exprimé sous forme d'une liste de clés de colonnes séparées par des virgules. Par défaut le tri est ascendant, si un nom de colonne est préfixé par un \"-\" alors le tri sera descendant.\n\nExemple: ma_colonne,-ma_colonne2"
+              }
+            }
+          }
+        },
+        "singleSearchs": {
+          "type": "array",
+          "title": "Recherche de paires code / libellé",
+          "x-class": "mb-4",
+          "x-options": {
+            "editMode": "dialog"
+          },
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "output"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "title": "Identifiant",
+                "x-if": "parent.value.id",
+                "readOnly": true
+              },
+              "title": {
+                "type": "string",
+                "title": "Titre",
+                "x-props": {
+                  "placeholder": "exemple \"recherche d'un produit\""
+                },
+                "minLength": 3
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "x-display": "textarea",
+                "x-props": {
+                  "placeholder": "exemple \"récupérez un code produit en effectuant une recherche dans son code ou son libellé\""
+                }
+              },
+              "output": {
+                "type": "object",
+                "title": "Propriété à retourner (code)",
+                "x-fromData": "context.propertiesWithConcepts",
+                "x-itemTitle": "title",
+                "x-itemKey": "key"
+              },
+              "label": {
+                "type": "object",
+                "title": "Propriété utilisée pour la recherche (libellé)",
+                "x-fromData": "context.stringProperties",
+                "x-itemTitle": "title",
+                "x-itemKey": "key"
+              },
+              "filters": {
+                "type": "array",
+                "title": "Filtres statiques",
+                "x-class": "mb-4",
+                "x-options": {
+                  "editMode": "inline"
+                },
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "property",
+                    "values"
+                  ],
+                  "properties": {
+                    "property": {
+                      "type": "object",
+                      "title": "Propriété sur laquelle appliquer le filtre",
+                      "x-fromData": "context.filterProperties",
+                      "x-itemTitle": "title",
+                      "x-itemKey": "key"
+                    },
+                    "values": {
+                      "type": "array",
+                      "title": "Valeurs",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "virtualDatasets": {
+          "type": "object",
+          "x-class": "mt-4",
+          "properties": {
+            "active": {
+              "type": "boolean",
+              "title": "Création de jeux virtuels"
+            }
+          }
+        },
+        "standardSchema": {
+          "type": "object",
+          "x-class": "mt-4",
+          "properties": {
+            "active": {
+              "type": "boolean",
+              "title": "Initialisation de jeux éditables"
+            }
+          }
+        }
+      }
+    },
+    "publications": {
+      "type": "array",
+      "description": "References to all the catalogs the dataset metadata is published too",
+      "items": {
+        "type": "object",
+        "required": [
+          "catalog",
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "catalog": {
+            "type": "string",
+            "description": "L'identifiant du catalogue de destination de cette publication."
+          },
+          "status": {
+            "type": "string",
+            "description": "A simple flag to clearly identify the publications that were successful. If \"published\" then the targetUrl key should be defined, If \"error\" then the error key should be defined.",
+            "enum": [
+              "waiting",
+              "published",
+              "error",
+              "deleted"
+            ]
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Date of the last update for this publication",
+            "format": "date-time"
+          },
+          "error": {
+            "type": "string"
+          },
+          "targetUrl": {
+            "type": "string"
+          },
+          "result": {
+            "type": "object",
+            "description": "The result of pushing the publication. The structure of this object is permissive and depends on the type of catalog"
+          },
+          "addToDataset": {
+            "type": "object",
+            "description": "Fill this object to create a new resource (or community resource) to an existing dataset.",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          "replaceDataset": {
+            "type": "object",
+            "description": "Fill this object to overwrite an existing dataset.",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "publicationSites": {
+      "type": "array",
+      "description": "References to all sites the dataset is exposed in.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requestedPublicationSites": {
+      "type": "array",
+      "description": "References to all sites the dataset would be exposed in if validated by an admin.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hasFiles": {
+      "type": "boolean",
+      "default": false,
+      "description": "true when the dataset has attached files"
+    },
+    "attachmentsAsImage": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set to true to use attached files as illustrations of the line"
+    },
+    "isVirtual": {
+      "type": "boolean",
+      "default": false,
+      "description": "Used to identify virtual datasets. A virtual datasets does not have data, only references to other datasets."
+    },
+    "virtual": {
+      "type": "object",
+      "description": "A configuration object dedicated to virtual datasets.",
+      "required": [
+        "children"
+      ],
+      "properties": {
+        "children": {
+          "type": "array",
+          "description": "Array of ids of the children datasets",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filters": {
+          "type": "array",
+          "description": "Array of static filters to always apply when querying the dataset",
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "values"
+            ],
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "Key of the field in the schema"
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "in",
+                  "nin"
+                ],
+                "default": "in"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "filterActiveAccount": {
+          "type": "boolean"
+        }
+      }
+    },
+    "isRest": {
+      "type": "boolean",
+      "default": false,
+      "description": "Used to identify REST datasets. A REST dataset is not created from a data file, but instead is based on a dynamic collection in a database."
+    },
+    "rest": {
+      "type": "object",
+      "description": "A configuration object dedicated to REST datasets.",
+      "properties": {
+        "ttl": {
+          "type": "object",
+          "required": [
+            "prop",
+            "delay"
+          ],
+          "properties": {
+            "active": {
+              "type": "boolean"
+            },
+            "prop": {
+              "type": "string"
+            },
+            "checkedAt": {
+              "type": "string",
+              "format": "date-time",
+              "readOnly": true
+            },
+            "delay": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "default": 0
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": [
+                    "hours",
+                    "days",
+                    "weeks",
+                    "months"
+                  ],
+                  "default": "days"
+                }
+              }
+            }
+          }
+        },
+        "history": {
+          "type": "boolean",
+          "default": false,
+          "description": "Set to true to let data-fair store revisions of the lines in the dataset."
+        },
+        "historyTTL": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "active": {
+              "type": "boolean"
+            },
+            "delay": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "default": 0
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": [
+                    "hours",
+                    "days",
+                    "weeks",
+                    "months"
+                  ],
+                  "default": "days"
+                }
+              }
+            }
+          }
+        },
+        "lineOwnership": {
+          "type": "boolean"
+        },
+        "storeUpdatedBy": {
+          "type": "boolean"
+        },
+        "primaryKeyMode": {
+          "type": "string",
+          "enum": [
+            "base64",
+            "sha256"
+          ]
+        },
+        "indiceMode": {
+          "type": "string",
+          "enum": [
+            "timestamp1",
+            "timestamp2",
+            "timestamp3"
+          ]
+        }
+      }
+    },
+    "isMetaOnly": {
+      "type": "boolean",
+      "default": false,
+      "description": "Used to identify datasets without any local data and only some metadata."
+    },
+    "topics": {
+      "type": "array",
+      "title": "Liste de thématiques",
+      "x-itemTitle": "title",
+      "items": {
+        "title": "Topic",
+        "x-exports": [
+          "types",
+          "schema"
+        ],
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false,
+        "layout": {
+          "switch": [
+            {
+              "if": "summary",
+              "children": []
+            }
+          ]
+        },
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "title": {
+            "type": "string",
+            "title": "Titre",
+            "x-i18n-title": {
+              "en": "Title"
+            }
+          },
+          "color": {
+            "type": "string",
+            "title": "Couleur",
+            "x-i18n-title": {
+              "en": "Color"
+            },
+            "x-display": "color-picker",
+            "layout": {
+              "comp": "color-picker",
+              "cols": 6
+            }
+          },
+          "icon": {
+            "type": "object",
+            "title": "Icône",
+            "x-i18n-title": {
+              "en": "Icon"
+            },
+            "description": "Il est possible de consulter plus facilement la liste des icônes disponibles sur <a href='https://pictogrammers.com/library/mdi/' target='_blank'>ce site </a>.<br>Commencez à taper pour rechercher dans la collection complète d'icônes. Seuls quelques icônes sont chargées initialement pour de meilleures performances.",
+            "x-i18n-description": {
+              "en": "You can easily browse the list of available icons on this <a href='https://pictogrammers.com/library/mdi/' target='_blank'>this website</a>.<br>Start typing to search through the complete collection of icons. Only a few icons are loaded initially for better performance."
+            },
+            "x-fromUrl": "https://koumoul.com/data-fair/api/v1/datasets/icons-mdi-latest/lines?q={q}",
+            "x-itemKey": "name",
+            "x-itemTitle": "name",
+            "x-itemIcon": "name",
+            "x-itemsProp": "results",
+            "layout": {
+              "getItems": {
+                "url": "https://koumoul.com/data-fair/api/v1/datasets/icons-mdi-latest/lines?q={q}&select=name,svg,svgPath&size=25",
+                "itemsResults": "data.results",
+                "itemTitle": "item.name",
+                "itemIcon": "item.svg",
+                "itemKey": "item.name"
+              },
+              "cols": 6
+            },
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "svg": {
+                "type": "string"
+              },
+              "svgPath": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "relatedDatasets": {
+      "type": "array",
+      "title": "Autres jeux de données à recommender",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "thumbnails": {
+      "type": "object",
+      "properties": {
+        "resizeMode": {
+          "type": "string",
+          "description": "Define how the thumbnails will be adapted to the size requested by visualizations",
+          "enum": [
+            "crop",
+            "smartCrop",
+            "fitIn"
+          ],
+          "default": "crop"
+        }
+      }
+    },
+    "extras": {
+      "type": "object",
+      "description": "An object for extra content from client services of data-fair"
+    },
+    "customMetadata": {
+      "type": "object",
+      "patternProperties": {
+        "^(.*)$": {
+          "type": "string"
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "escapeKeyAlgorithm": {
+          "type": "string",
+          "default": "slug",
+          "enum": [
+            "legacy",
+            "slug",
+            "compat-ods"
+          ]
+        }
+      }
+    },
+    "permissions": {
+      "title": "Permissions",
+      "x-exports": [
+        "types",
+        "validate",
+        "resolvedSchema"
+      ],
+      "type": "array",
+      "items": {
+        "title": "Permission",
+        "type": "object",
+        "description": "Permission to do the operations (identified by their id). If type and id are not set, then the operation is set to public. roles array is used only with type organization",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "organization"
+            ],
+            "description": "If the entity is a user or an organization"
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifier of the entity"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the entity"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the user"
+          },
+          "department": {
+            "type": "string",
+            "description": "Identifier of the department or \"*\" for any department (same as empty) or \"-\" for no department"
+          },
+          "departmentName": {
+            "type": "string",
+            "description": "Name of the department"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Role name"
+            }
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "API operation that can be used"
+            }
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "API permission classes that can be used"
+            }
+          }
+        }
+      },
+      "$defs": {
+        "permission": {
+          "title": "Permission",
+          "type": "object",
+          "description": "Permission to do the operations (identified by their id). If type and id are not set, then the operation is set to public. roles array is used only with type organization",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "user",
+                "organization"
+              ],
+              "description": "If the entity is a user or an organization"
+            },
+            "id": {
+              "type": "string",
+              "description": "Identifier of the entity"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the entity"
+            },
+            "email": {
+              "type": "string",
+              "description": "Email of the user"
+            },
+            "department": {
+              "type": "string",
+              "description": "Identifier of the department or \"*\" for any department (same as empty) or \"-\" for no department"
+            },
+            "departmentName": {
+              "type": "string",
+              "description": "Name of the department"
+            },
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Role name"
+              }
+            },
+            "operations": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "API operation that can be used"
+              }
+            },
+            "classes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "API permission classes that can be used"
+              }
+            }
+          }
+        }
+      }
+    },
+    "previews": {
+      "type": "array",
+      "title": "Prévisualisations",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "readApiKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "title": "Activer l'accès par clé d'API"
+        },
+        "interval": {
+          "type": "string",
+          "title": "Durée de validité des clés",
+          "oneOf": [
+            {
+              "const": "P1W",
+              "title": "1 semaine"
+            },
+            {
+              "const": "P1M",
+              "title": "1 mois"
+            },
+            {
+              "const": "P1Y",
+              "title": "1 année"
+            }
+          ]
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "x-display": "hidden"
+        },
+        "renewAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "x-display": "hidden"
+        }
+      }
+    },
+    "esWarning": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "MissingIndex",
+        "IndexHealthRed",
+        "MissingIndexSettings",
+        "ShardingRecommended"
+      ]
+    },
+    "draftReason": {
+      "type": "object",
+      "title": "Why was the dataset switched in draft mode",
+      "properties": {
+        "key": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "file-new",
+            "file-updated"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "validationMode": {
+          "type": "string",
+          "enum": [
+            "never",
+            "always",
+            "compatible",
+            "compatibleOrCancel"
+          ]
+        }
+      }
+    },
+    "nonBlockingValidation": {
+      "type": "boolean"
+    },
+    "draft": {
+      "title": "Dataset draft",
+      "description": "Some properties waiting for confirmation before being merged into the main dataset info",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "draftReason": {
+          "type": "object",
+          "title": "Why was the dataset switched in draft mode",
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "manual",
+                "file-new",
+                "file-updated"
+              ]
+            },
+            "message": {
+              "type": "string"
+            },
+            "validationMode": {
+              "type": "string",
+              "enum": [
+                "never",
+                "always",
+                "compatible",
+                "compatibleOrCancel"
+              ]
+            }
+          }
+        },
+        "validateDraft": {
+          "type": "boolean",
+          "title": "indicates that the draft was validated and is being processed to replace the current state"
+        },
+        "file": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "size",
+            "mimetype",
+            "schema"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the file that was used to create or update this dataset"
+            },
+            "size": {
+              "type": "number",
+              "description": "Size of the file on disk"
+            },
+            "encoding": {
+              "type": "string",
+              "description": "Encoding of the file (either explicitly defined or detected)"
+            },
+            "explicitEncoding": {
+              "type": "string",
+              "description": "Encoding of the file explicitly defined when loading it"
+            },
+            "mimetype": {
+              "type": "string",
+              "description": "Mime type of the file"
+            },
+            "schema": {
+              "type": "array",
+              "description": "JSON schema properties of the fields in the file",
+              "items": {
+                "type": "object",
+                "required": [
+                  "key"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "separator": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "dateFormat": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "dateTimeFormat": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "timeZone": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "props": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "numLines": {
+                  "type": "number",
+                  "description": "Number of lines this file has."
+                },
+                "linesDelimiter": {
+                  "type": "string",
+                  "description": "New line character or characters (can be \r\n))"
+                },
+                "fieldsDelimiter": {
+                  "type": "string",
+                  "description": "Fields delimiter"
+                },
+                "escapeChar": {
+                  "type": "string",
+                  "description": "Character used to escape string"
+                },
+                "quote": {
+                  "type": "string",
+                  "description": "Character used to wrap strings"
+                }
+              }
+            }
+          }
+        },
+        "originalFile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "size",
+            "mimetype"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the file that was used to create or update this dataset"
+            },
+            "size": {
+              "type": "number",
+              "description": "Size of the file on disk"
+            },
+            "encoding": {
+              "type": "string",
+              "description": "Encoding of the file (either explicitly defined or detected)"
+            },
+            "explicitEncoding": {
+              "type": "string",
+              "description": "Encoding of the file explicitly defined when loading it"
+            },
+            "normalizeOptions": {
+              "type": "object",
+              "description": "Normalize options specific to the original file format",
+              "additionalProperties": false,
+              "properties": {
+                "spreadsheetWorksheetIndex": {
+                  "type": "number"
+                },
+                "spreadsheetHeaderLine": {
+                  "type": "number"
+                },
+                "spreadsheetStartCol": {
+                  "type": "number"
+                }
+              }
+            },
+            "mimetype": {
+              "type": "string",
+              "description": "Mime type of the file"
+            },
+            "md5": {
+              "type": "string",
+              "description": "MD5 hash of the file content"
+            }
+          }
+        },
+        "schema": {
+          "type": "array",
+          "description": "JSON schema properties of the fields",
+          "items": {
+            "type": "object",
+            "required": [
+              "key"
+            ],
+            "properties": {
+              "key": {
+                "type": "string",
+                "readOnly": true,
+                "x-display": "hidden"
+              },
+              "type": {
+                "type": "string"
+              },
+              "format": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "x-originalName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "x-group": {
+                "type": "string"
+              },
+              "x-refersTo": {
+                "deprecated": true,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "x-concept": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "primary": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "x-calculated": {
+                "type": "boolean"
+              },
+              "x-capabilities": {
+                "type": "object",
+                "properties": {
+                  "index": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-display": "switch",
+                    "title": "Filtrable sur valeur exacte",
+                    "description": "Désactivez cette capacité si la donnée contient par exemple des textes longs pour lesquels des filtres sur valeurs exactes ont peu de sens."
+                  },
+                  "values": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-display": "switch",
+                    "title": "Triable et groupable",
+                    "description": "Désactivez cette capacité si la donnée contient par exemple des textes longs pour lesquels trier ou grouper par valeur a peu de sens."
+                  },
+                  "textStandard": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-display": "switch",
+                    "title": "Texte analysé pour recherche textuelle",
+                    "description": "Désactivez cette capacité dans le cas d'un code, une url, etc. N'importe quel contenu sur lequel la recherche de mots a peu de sens."
+                  },
+                  "text": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-display": "switch",
+                    "title": "Texte analysé spécifiquement pour la langue française",
+                    "description": "Désactivez cette capacité pour tout contenu qui n'est pas en langue française ou pour lequel la recherche de mots a peu de sens."
+                  },
+                  "textAgg": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-display": "switch",
+                    "title": "Statistiques de mots",
+                    "description": "Activez cette capacité si avez l'intention d'obtenir des statistiques sur les occurrences de mots (par exemple pour construire un nuage de mot)."
+                  },
+                  "wildcard": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-display": "switch",
+                    "title": "Texte filtrable sur groupe de caractères",
+                    "description": "Activez cette capacité si vous avez l'intention de filtrer ce contenu spécifiquement sur une suite de caractères (par exemple si un filtre sur mots entiers ou sur valeur exacte ne convient pas)."
+                  },
+                  "insensitive": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-display": "switch",
+                    "title": "Tri amélioré avec casse et accents",
+                    "description": "Désactivez cette capacité si le contenu ne sera pas utilisé pour du tri ou bien si il ne contient pas de variations avec accents et majuscules."
+                  },
+                  "geoShape": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-display": "switch",
+                    "title": "Formes géométriques complexes",
+                    "description": "Désactivez cette capacité si la donnée ne contient que des géométries basiques de points ou bien si requêter les géométries uniquement à partir de leurs centroïdes est suffisant pour vos besoins."
+                  },
+                  "vtPrepare": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-display": "switch",
+                    "title": "Tuiles vectorielles préparées",
+                    "description": "Activez cette capacité pour précalculer des éléments utiles à la construction de tuiles vectorielles pour le rendu cartographique du jeu de données. Activez cette option si le jeu de données contient des données géogreaphiques denses à afficher en grande quantité. La contre-partie est une augmentation du temps d'indexation et du volume de données indexées."
+                  },
+                  "indexAttachment": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-display": "switch",
+                    "title": "Contenu des pièces jointes analysé pour recherche textuelle",
+                    "description": "Désactivez cette option si vous souhaitez que les pièces jointes soient simplement téléchargeables et que l'extraction de leur contenu textuel pour recherche de mots n'est pas pertinente."
+                  }
+                }
+              },
+              "x-labels": {
+                "type": "object",
+                "patternProperties": {
+                  ".*": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-labelsRestricted": {
+                "type": "boolean"
+              },
+              "readOnly": {
+                "type": "boolean"
+              },
+              "x-required": {
+                "type": "boolean"
+              },
+              "minLength": {
+                "type": "integer"
+              },
+              "maxLength": {
+                "type": "integer"
+              },
+              "minimum": {
+                "type": "number"
+              },
+              "maximum": {
+                "type": "number"
+              },
+              "pattern": {
+                "type": "string",
+                "format": "regex"
+              },
+              "patternErrorMessage": {
+                "type": "string"
+              },
+              "x-master": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "remoteService": {
+                    "type": "string",
+                    "description": "L'identifiant du service distant utilisé pour l'enrichissement"
+                  },
+                  "action": {
+                    "type": "string",
+                    "description": "L'identifiant de l'action du service distant à utiliser pour l'enrichissement"
+                  }
+                }
+              },
+              "x-display": {
+                "type": "string"
+              },
+              "enum": {
+                "type": "array",
+                "readOnly": true,
+                "description": "This differs from JSON schema. It is not a restriction, just and observation of the values that are present in the dataset."
+              },
+              "x-cardinality": {
+                "type": "integer",
+                "description": "The number of distinct values for this field",
+                "readOnly": true
+              },
+              "x-transform": {
+                "type": "object",
+                "description": "Transformation to apply to the field",
+                "properties": {
+                  "expr": {
+                    "type": "string"
+                  },
+                  "examples": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "format": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the dataset"
+        },
+        "title": {
+          "type": "string",
+          "description": "Short title of the dataset"
+        },
+        "license": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "href"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Short title for the license"
+            },
+            "href": {
+              "type": "string",
+              "description": "The URL where the license can be read"
+            }
+          }
+        },
+        "origin": {
+          "type": "string",
+          "description": "The URL where the original data can be found"
+        },
+        "estensions": {
+          "type": "array",
+          "description": "Définition des enrichissements appliqués à ce jeu de données",
+          "items": {
+            "type": "object",
+            "properties": {
+              "active": {
+                "type": "boolean",
+                "description": "Toggle on and off the extension"
+              },
+              "needsUpdate": {
+                "type": "boolean"
+              },
+              "autoUpdate": {
+                "type": "boolean"
+              },
+              "nextUpdate": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "oneOf": [
+              {
+                "required": [
+                  "type",
+                  "expr",
+                  "property"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "exprEval"
+                  },
+                  "expr": {
+                    "type": "string"
+                  },
+                  "property": {
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "type"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "required": [
+                  "type",
+                  "remoteService",
+                  "action"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "remoteService"
+                  },
+                  "remoteService": {
+                    "type": "string",
+                    "description": "L'identifiant du service distant utilisé pour l'enrichissement"
+                  },
+                  "action": {
+                    "type": "string",
+                    "description": "L'identifiant de l'action du service distant à utiliser pour l'enrichissement"
+                  },
+                  "select": {
+                    "type": "array",
+                    "description": "La liste des colonnes à sélectionner dans le retour du service distant. Toutes les colonnes si absent ou vide.",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "overwriteProperties": {
+                    "type": "object",
+                    "description": "Les attributs à surcharger sur les proprités résultats de l'enrichissement",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "x-originalName": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "shortId": {
+                    "type": "string",
+                    "description": "Id court (déprécié)",
+                    "readOnly": true
+                  },
+                  "propertyPrefix": {
+                    "type": "string",
+                    "description": "Chaine à utiliser comme préfixe des clés de champs issus de cette extension"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "publications": {
+          "type": "array",
+          "description": "References to all the catalogs the dataset metadata is published too",
+          "items": {
+            "type": "object",
+            "required": [
+              "catalog",
+              "status"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "catalog": {
+                "type": "string",
+                "description": "L'identifiant du catalogue de destination de cette publication."
+              },
+              "status": {
+                "type": "string",
+                "description": "A simple flag to clearly identify the publications that were successful. If \"published\" then the targetUrl key should be defined, If \"error\" then the error key should be defined.",
+                "enum": [
+                  "waiting",
+                  "published",
+                  "error",
+                  "deleted"
+                ]
+              },
+              "publishedAt": {
+                "type": "string",
+                "description": "Date of the last update for this publication",
+                "format": "date-time"
+              },
+              "error": {
+                "type": "string"
+              },
+              "targetUrl": {
+                "type": "string"
+              },
+              "result": {
+                "type": "object",
+                "description": "The result of pushing the publication. The structure of this object is permissive and depends on the type of catalog"
+              },
+              "addToDataset": {
+                "type": "object",
+                "description": "Fill this object to create a new resource (or community resource) to an existing dataset.",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              },
+              "replaceDataset": {
+                "type": "object",
+                "description": "Fill this object to overwrite an existing dataset.",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "publicationSites": {
+          "type": "array",
+          "description": "References to all sites the dataset is exposed in.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "virtual": {
+          "type": "object",
+          "description": "A configuration object dedicated to virtual datasets.",
+          "required": [
+            "children"
+          ],
+          "properties": {
+            "children": {
+              "type": "array",
+              "description": "Array of ids of the children datasets",
+              "items": {
+                "type": "string"
+              }
+            },
+            "filters": {
+              "type": "array",
+              "description": "Array of static filters to always apply when querying the dataset",
+              "items": {
+                "type": "object",
+                "required": [
+                  "key",
+                  "values"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "description": "Key of the field in the schema"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "enum": [
+                      "in",
+                      "nin"
+                    ],
+                    "default": "in"
+                  },
+                  "values": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "filterActiveAccount": {
+              "type": "boolean"
+            }
+          }
+        },
+        "rest": {
+          "type": "object",
+          "description": "A configuration object dedicated to REST datasets.",
+          "properties": {
+            "ttl": {
+              "type": "object",
+              "required": [
+                "prop",
+                "delay"
+              ],
+              "properties": {
+                "active": {
+                  "type": "boolean"
+                },
+                "prop": {
+                  "type": "string"
+                },
+                "checkedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "readOnly": true
+                },
+                "delay": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "integer",
+                      "default": 0
+                    },
+                    "unit": {
+                      "type": "string",
+                      "enum": [
+                        "hours",
+                        "days",
+                        "weeks",
+                        "months"
+                      ],
+                      "default": "days"
+                    }
+                  }
+                }
+              }
+            },
+            "history": {
+              "type": "boolean",
+              "default": false,
+              "description": "Set to true to let data-fair store revisions of the lines in the dataset."
+            },
+            "historyTTL": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "active": {
+                  "type": "boolean"
+                },
+                "delay": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "value": {
+                      "type": "integer",
+                      "default": 0
+                    },
+                    "unit": {
+                      "type": "string",
+                      "enum": [
+                        "hours",
+                        "days",
+                        "weeks",
+                        "months"
+                      ],
+                      "default": "days"
+                    }
+                  }
+                }
+              }
+            },
+            "lineOwnership": {
+              "type": "boolean"
+            },
+            "storeUpdatedBy": {
+              "type": "boolean"
+            },
+            "primaryKeyMode": {
+              "type": "string",
+              "enum": [
+                "base64",
+                "sha256"
+              ]
+            },
+            "indiceMode": {
+              "type": "string",
+              "enum": [
+                "timestamp1",
+                "timestamp2",
+                "timestamp3"
+              ]
+            }
+          }
+        },
+        "extras": {
+          "type": "object",
+          "description": "An object for extra content from client services of data-fair"
+        },
+        "attachmentsAsImage": {
+          "type": "boolean",
+          "default": false,
+          "description": "Set to true to use attached files as illustrations of the line"
+        },
+        "projection": {
+          "type": "object",
+          "description": "The cartographic projection of this dataset. Refers to the list of supported projections in contract/projections.json",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "title": "Titre",
+                "x-props": {
+                  "outlined": true,
+                  "dense": true
+                }
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "x-display": "markdown"
+              },
+              "includeInCatalogPublications": {
+                "type": "boolean",
+                "title": "Inclure dans les publications sur catalogue",
+                "default": false
+              }
+            },
+            "oneOf": [
+              {
+                "title": "Fichier",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "type": {
+                    "title": "Type de pièce jointe",
+                    "const": "file"
+                  },
+                  "name": {
+                    "x-display": "hidden",
+                    "type": "string",
+                    "description": "Name of the file that was used to create or update this attachment"
+                  },
+                  "size": {
+                    "x-display": "hidden",
+                    "type": "number",
+                    "description": "Size of the file on disk"
+                  },
+                  "mimetype": {
+                    "x-display": "hidden",
+                    "type": "string",
+                    "description": "Mime type of the file"
+                  },
+                  "updatedAt": {
+                    "x-display": "hidden",
+                    "type": "string",
+                    "description": "Date of the last update for this attachment",
+                    "format": "date-time"
+                  },
+                  "url": {
+                    "x-display": "hidden",
+                    "readOnly": true,
+                    "type": "string",
+                    "title": "URL"
+                  }
+                }
+              },
+              {
+                "title": "Lien",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "type": {
+                    "title": "Type de pièce jointe",
+                    "const": "url"
+                  },
+                  "url": {
+                    "type": "string",
+                    "title": "URL"
+                  }
+                }
+              },
+              {
+                "title": "Fichier récupéré depuis une URL",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "type": {
+                    "title": "Type de pièce jointe",
+                    "const": "remoteFile"
+                  },
+                  "name": {
+                    "type": "string",
+                    "title": "Nom du fichier",
+                    "description": "Ce nom doit contenir l'extension qui doit correspondre au format du fichier téléchargé.",
+                    "x-rules": [
+                      "hasExtension"
+                    ]
+                  },
+                  "targetUrl": {
+                    "type": "string",
+                    "title": "URL de téléchargement",
+                    "description": "Cette URL n'est pas consultable après écriture. Elle est utilisée pour télécharger le fichier depuis un service distant et peut contenir un secret. Vous pouvez la laisser vide quand vous modifiez les autres informations, mais vous devez la renseigner de nouveau si vous changez le nom de fichier."
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "topics": {
+          "type": "array",
+          "title": "Liste de thématiques",
+          "x-itemTitle": "title",
+          "items": {
+            "title": "Topic",
+            "x-exports": [
+              "types",
+              "schema"
+            ],
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "additionalProperties": false,
+            "layout": {
+              "switch": [
+                {
+                  "if": "summary",
+                  "children": []
+                }
+              ]
+            },
+            "properties": {
+              "id": {
+                "type": "string",
+                "readOnly": true
+              },
+              "title": {
+                "type": "string",
+                "title": "Titre",
+                "x-i18n-title": {
+                  "en": "Title"
+                }
+              },
+              "color": {
+                "type": "string",
+                "title": "Couleur",
+                "x-i18n-title": {
+                  "en": "Color"
+                },
+                "x-display": "color-picker",
+                "layout": {
+                  "comp": "color-picker",
+                  "cols": 6
+                }
+              },
+              "icon": {
+                "type": "object",
+                "title": "Icône",
+                "x-i18n-title": {
+                  "en": "Icon"
+                },
+                "description": "Il est possible de consulter plus facilement la liste des icônes disponibles sur <a href='https://pictogrammers.com/library/mdi/' target='_blank'>ce site </a>.<br>Commencez à taper pour rechercher dans la collection complète d'icônes. Seuls quelques icônes sont chargées initialement pour de meilleures performances.",
+                "x-i18n-description": {
+                  "en": "You can easily browse the list of available icons on this <a href='https://pictogrammers.com/library/mdi/' target='_blank'>this website</a>.<br>Start typing to search through the complete collection of icons. Only a few icons are loaded initially for better performance."
+                },
+                "x-fromUrl": "https://koumoul.com/data-fair/api/v1/datasets/icons-mdi-latest/lines?q={q}",
+                "x-itemKey": "name",
+                "x-itemTitle": "name",
+                "x-itemIcon": "name",
+                "x-itemsProp": "results",
+                "layout": {
+                  "getItems": {
+                    "url": "https://koumoul.com/data-fair/api/v1/datasets/icons-mdi-latest/lines?q={q}&select=name,svg,svgPath&size=25",
+                    "itemsResults": "data.results",
+                    "itemTitle": "item.name",
+                    "itemIcon": "item.svg",
+                    "itemKey": "item.name"
+                  },
+                  "cols": 6
+                },
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "svg": {
+                    "type": "string"
+                  },
+                  "svgPath": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "thumbnails": {
+          "type": "object",
+          "properties": {
+            "resizeMode": {
+              "type": "string",
+              "description": "Define how the thumbnails will be adapted to the size requested by visualizations",
+              "enum": [
+                "crop",
+                "smartCrop",
+                "fitIn"
+              ],
+              "default": "crop"
+            }
+          }
+        },
+        "masterData": {
+          "type": "object",
+          "title": "Données de référence",
+          "properties": {
+            "shareOrgs": {
+              "type": "array",
+              "title": "Partagez cette donnée de référence avec vos partenaires",
+              "x-if": "context.ownerOrg",
+              "x-fromUrl": "{context.directoryUrl}/api/{context.dataset.owner.type}s/{context.dataset.owner.id}",
+              "x-itemsProp": "partners",
+              "x-itemTitle": "name",
+              "x-itemKey": "id",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "bulkSearchs": {
+              "type": "array",
+              "title": "Récupération de lignes en masse",
+              "x-class": "my-4",
+              "x-options": {
+                "editMode": "dialog"
+              },
+              "items": {
+                "type": "object",
+                "required": [
+                  "title"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "title": "Identifiant",
+                    "x-if": "parent.value.id",
+                    "readOnly": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "title": "Titre",
+                    "x-props": {
+                      "placeholder": "exemple \"récupérer les informations de plusieurs produits\""
+                    },
+                    "minLength": 3
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "Description",
+                    "x-display": "textarea",
+                    "x-props": {
+                      "placeholder": "exemple \"cet enrichissement vous permet de récupérer les informations de plusieurs produits à partir d'une liste de codes produits.\""
+                    }
+                  },
+                  "filters": {
+                    "type": "array",
+                    "title": "Filtres statiques",
+                    "x-class": "mb-4",
+                    "x-options": {
+                      "editMode": "inline"
+                    },
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "property",
+                        "values"
+                      ],
+                      "properties": {
+                        "property": {
+                          "type": "object",
+                          "title": "Propriété sur laquelle appliquer le filtre",
+                          "x-fromData": "context.filterProperties",
+                          "x-itemTitle": "title",
+                          "x-itemKey": "key"
+                        },
+                        "values": {
+                          "type": "array",
+                          "title": "Valeurs",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "input": {
+                    "type": "array",
+                    "title": "Méthodes de correspondance",
+                    "x-class": "mb-4",
+                    "minItems": 1,
+                    "x-options": {
+                      "editMode": "inline"
+                    },
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "property"
+                      ],
+                      "oneOf": [
+                        {
+                          "title": "Valeurs exactement égales",
+                          "required": [
+                            "type",
+                            "property"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "const": "equals",
+                              "title": "Type de méthode de correspondance"
+                            },
+                            "property": {
+                              "type": "object",
+                              "title": "Propriété comparée",
+                              "x-fromData": "context.propertiesWithConcepts",
+                              "x-itemTitle": "title",
+                              "x-itemKey": "key"
+                            }
+                          }
+                        },
+                        {
+                          "title": "Date dans un interval",
+                          "x-if": "context.hasDateIntervalConcepts",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "const": "date-in-interval"
+                            },
+                            "property": {
+                              "type": "object",
+                              "title": "Date à renseigner",
+                              "properties": {
+                                "x-refersTo": {
+                                  "type": "string",
+                                  "const": "http://schema.org/Date"
+                                },
+                                "key": {
+                                  "type": "string",
+                                  "const": "_date"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "const": "string"
+                                },
+                                "format": {
+                                  "type": "string",
+                                  "const": "date-time"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "title": "Coordonnée géographique à proximité",
+                          "x-if": "context.dataset.bbox",
+                          "required": [
+                            "type",
+                            "distance"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "const": "geo-distance"
+                            },
+                            "distance": {
+                              "type": "integer",
+                              "title": "Distance",
+                              "default": 0
+                            },
+                            "property": {
+                              "type": "object",
+                              "title": "Point à renseigner",
+                              "properties": {
+                                "x-refersTo": {
+                                  "type": "string",
+                                  "const": "http://www.w3.org/2003/01/geo/wgs84_pos#lat_long"
+                                },
+                                "key": {
+                                  "type": "string",
+                                  "const": "_geopoint"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "const": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "sort": {
+                    "type": "string",
+                    "title": "Tri pour choisir parmi des résultats ambigus",
+                    "description": "\nRemarque : ce paramètre est optionnel et utile uniquement si la manière d'établir une correspondance est susceptible de retourner plusieurs résultats par ligne.\n\nLe tri est exprimé sous forme d'une liste de clés de colonnes séparées par des virgules. Par défaut le tri est ascendant, si un nom de colonne est préfixé par un \"-\" alors le tri sera descendant.\n\nExemple: ma_colonne,-ma_colonne2"
+                  }
+                }
+              }
+            },
+            "singleSearchs": {
+              "type": "array",
+              "title": "Recherche de paires code / libellé",
+              "x-class": "mb-4",
+              "x-options": {
+                "editMode": "dialog"
+              },
+              "items": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "output"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "title": "Identifiant",
+                    "x-if": "parent.value.id",
+                    "readOnly": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "title": "Titre",
+                    "x-props": {
+                      "placeholder": "exemple \"recherche d'un produit\""
+                    },
+                    "minLength": 3
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "Description",
+                    "x-display": "textarea",
+                    "x-props": {
+                      "placeholder": "exemple \"récupérez un code produit en effectuant une recherche dans son code ou son libellé\""
+                    }
+                  },
+                  "output": {
+                    "type": "object",
+                    "title": "Propriété à retourner (code)",
+                    "x-fromData": "context.propertiesWithConcepts",
+                    "x-itemTitle": "title",
+                    "x-itemKey": "key"
+                  },
+                  "label": {
+                    "type": "object",
+                    "title": "Propriété utilisée pour la recherche (libellé)",
+                    "x-fromData": "context.stringProperties",
+                    "x-itemTitle": "title",
+                    "x-itemKey": "key"
+                  },
+                  "filters": {
+                    "type": "array",
+                    "title": "Filtres statiques",
+                    "x-class": "mb-4",
+                    "x-options": {
+                      "editMode": "inline"
+                    },
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "property",
+                        "values"
+                      ],
+                      "properties": {
+                        "property": {
+                          "type": "object",
+                          "title": "Propriété sur laquelle appliquer le filtre",
+                          "x-fromData": "context.filterProperties",
+                          "x-itemTitle": "title",
+                          "x-itemKey": "key"
+                        },
+                        "values": {
+                          "type": "array",
+                          "title": "Valeurs",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "virtualDatasets": {
+              "type": "object",
+              "x-class": "mt-4",
+              "properties": {
+                "active": {
+                  "type": "boolean",
+                  "title": "Création de jeux virtuels"
+                }
+              }
+            },
+            "standardSchema": {
+              "type": "object",
+              "x-class": "mt-4",
+              "properties": {
+                "active": {
+                  "type": "boolean",
+                  "title": "Initialisation de jeux éditables"
+                }
+              }
+            }
+          }
+        },
+        "primaryKey": {
+          "type": "array",
+          "description": "List of properties of the schema used as unique primary key for each line",
+          "items": {
+            "type": "string"
+          }
+        },
+        "image": {
+          "type": "string",
+          "description": "URL d'une image, illustration du jeu de données"
+        },
+        "spatial": {
+          "type": "string",
+          "description": "spatial coverage"
+        },
+        "temporal": {
+          "type": "object",
+          "description": "temporal coverage",
+          "properties": {
+            "start": {
+              "type": "string",
+              "format": "date"
+            },
+            "end": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "description": "keywords",
+          "items": {
+            "type": "string"
+          }
+        },
+        "frequency": {
+          "type": "string",
+          "description": "update frequency",
+          "enum": [
+            "",
+            "triennial",
+            "biennial",
+            "annual",
+            "semiannual",
+            "threeTimesAYear",
+            "quarterly",
+            "bimonthly",
+            "monthly",
+            "semimonthly",
+            "biweekly",
+            "threeTimesAMonth",
+            "weekly",
+            "semiweekly",
+            "threeTimesAWeek",
+            "daily",
+            "continuous",
+            "irregular"
+          ]
+        },
+        "customMetadata": {
+          "type": "object",
+          "patternProperties": {
+            "^(.*)$": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "normalizeOptions": {
+      "type": "object",
+      "description": "Normalize options specific to the original file format",
+      "additionalProperties": false,
+      "properties": {
+        "spreadsheetWorksheetIndex": {
+          "type": "number"
+        },
+        "spreadsheetHeaderLine": {
+          "type": "number"
+        },
+        "spreadsheetStartCol": {
+          "type": "number"
+        }
+      }
+    },
+    "schemaProperty": {
+      "type": "object",
+      "required": [
+        "key"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "readOnly": true,
+          "x-display": "hidden"
+        },
+        "type": {
+          "type": "string"
+        },
+        "format": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "x-originalName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "x-group": {
+          "type": "string"
+        },
+        "x-refersTo": {
+          "deprecated": true,
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "x-concept": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "primary": {
+              "type": "boolean"
+            }
+          }
+        },
+        "x-calculated": {
+          "type": "boolean"
+        },
+        "x-capabilities": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "boolean",
+              "default": true,
+              "x-display": "switch",
+              "title": "Filtrable sur valeur exacte",
+              "description": "Désactivez cette capacité si la donnée contient par exemple des textes longs pour lesquels des filtres sur valeurs exactes ont peu de sens."
+            },
+            "values": {
+              "type": "boolean",
+              "default": true,
+              "x-display": "switch",
+              "title": "Triable et groupable",
+              "description": "Désactivez cette capacité si la donnée contient par exemple des textes longs pour lesquels trier ou grouper par valeur a peu de sens."
+            },
+            "textStandard": {
+              "type": "boolean",
+              "default": true,
+              "x-display": "switch",
+              "title": "Texte analysé pour recherche textuelle",
+              "description": "Désactivez cette capacité dans le cas d'un code, une url, etc. N'importe quel contenu sur lequel la recherche de mots a peu de sens."
+            },
+            "text": {
+              "type": "boolean",
+              "default": true,
+              "x-display": "switch",
+              "title": "Texte analysé spécifiquement pour la langue française",
+              "description": "Désactivez cette capacité pour tout contenu qui n'est pas en langue française ou pour lequel la recherche de mots a peu de sens."
+            },
+            "textAgg": {
+              "type": "boolean",
+              "default": false,
+              "x-display": "switch",
+              "title": "Statistiques de mots",
+              "description": "Activez cette capacité si avez l'intention d'obtenir des statistiques sur les occurrences de mots (par exemple pour construire un nuage de mot)."
+            },
+            "wildcard": {
+              "type": "boolean",
+              "default": false,
+              "x-display": "switch",
+              "title": "Texte filtrable sur groupe de caractères",
+              "description": "Activez cette capacité si vous avez l'intention de filtrer ce contenu spécifiquement sur une suite de caractères (par exemple si un filtre sur mots entiers ou sur valeur exacte ne convient pas)."
+            },
+            "insensitive": {
+              "type": "boolean",
+              "default": true,
+              "x-display": "switch",
+              "title": "Tri amélioré avec casse et accents",
+              "description": "Désactivez cette capacité si le contenu ne sera pas utilisé pour du tri ou bien si il ne contient pas de variations avec accents et majuscules."
+            },
+            "geoShape": {
+              "type": "boolean",
+              "default": true,
+              "x-display": "switch",
+              "title": "Formes géométriques complexes",
+              "description": "Désactivez cette capacité si la donnée ne contient que des géométries basiques de points ou bien si requêter les géométries uniquement à partir de leurs centroïdes est suffisant pour vos besoins."
+            },
+            "vtPrepare": {
+              "type": "boolean",
+              "default": false,
+              "x-display": "switch",
+              "title": "Tuiles vectorielles préparées",
+              "description": "Activez cette capacité pour précalculer des éléments utiles à la construction de tuiles vectorielles pour le rendu cartographique du jeu de données. Activez cette option si le jeu de données contient des données géogreaphiques denses à afficher en grande quantité. La contre-partie est une augmentation du temps d'indexation et du volume de données indexées."
+            },
+            "indexAttachment": {
+              "type": "boolean",
+              "default": true,
+              "x-display": "switch",
+              "title": "Contenu des pièces jointes analysé pour recherche textuelle",
+              "description": "Désactivez cette option si vous souhaitez que les pièces jointes soient simplement téléchargeables et que l'extraction de leur contenu textuel pour recherche de mots n'est pas pertinente."
+            }
+          }
+        },
+        "x-labels": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          }
+        },
+        "x-labelsRestricted": {
+          "type": "boolean"
+        },
+        "readOnly": {
+          "type": "boolean"
+        },
+        "x-required": {
+          "type": "boolean"
+        },
+        "minLength": {
+          "type": "integer"
+        },
+        "maxLength": {
+          "type": "integer"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "pattern": {
+          "type": "string",
+          "format": "regex"
+        },
+        "patternErrorMessage": {
+          "type": "string"
+        },
+        "x-master": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "remoteService": {
+              "type": "string",
+              "description": "L'identifiant du service distant utilisé pour l'enrichissement"
+            },
+            "action": {
+              "type": "string",
+              "description": "L'identifiant de l'action du service distant à utiliser pour l'enrichissement"
+            }
+          }
+        },
+        "x-display": {
+          "type": "string"
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "description": "This differs from JSON schema. It is not a restriction, just and observation of the values that are present in the dataset."
+        },
+        "x-cardinality": {
+          "type": "integer",
+          "description": "The number of distinct values for this field",
+          "readOnly": true
+        },
+        "x-transform": {
+          "type": "object",
+          "description": "Transformation to apply to the field",
+          "properties": {
+            "expr": {
+              "type": "string"
+            },
+            "examples": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "type": {
+              "type": "string"
+            },
+            "format": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+Serveurs
+https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant - Jeu de données Data Fair - data.ademe.fr - DPE Logements existants (depuis juillet 2021)
+
+C. Métadonnées
+
+Lire les informations : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/
+Lire le schéma : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/schema
+Lire le schéma réduit : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/safe-schema
+Obtenir la documentation OpenAPI : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/api-docs.json
+
+D. Données
+Lire les lignes : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines
+Agréger les valeurs : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/values_agg
+Lister les valeurs distinctes : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/values/{field}
+Calculer une métrique : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/metric_agg
+Calculer des métriques simples : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/simple_metrics_agg
+Lister les mots significatifs : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/words_agg
+Agréger spatialement : GET https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/geo_agg
+
+E. Données de références : 
+Identifiant DPE : POST https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/master-data/bulk-searchs/identifiant-dpe
